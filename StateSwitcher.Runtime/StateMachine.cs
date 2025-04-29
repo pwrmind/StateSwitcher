@@ -1,10 +1,23 @@
 ﻿namespace StateSwitcher.Runtime;
 
+/// <summary>
+/// Generic state machine implementation that manages state transitions based on causes.
+/// </summary>
+/// <typeparam name="S">The type of states (must be an enum)</typeparam>
+/// <typeparam name="C">The type of causes that trigger state transitions</typeparam>
 public class StateMachine<S, C> where S : struct, IConvertible
 {
     private Dictionary<S, Dictionary<C, Transition<S, C>>> _states;
+    /// <summary>
+    /// Gets the current state of the state machine.
+    /// </summary>
     public S CurrentState { get; private set; }
 
+    /// <summary>
+    /// Initializes a new state machine with the specified start state.
+    /// </summary>
+    /// <param name="startState">The initial state of the machine</param>
+    /// <exception cref="ArgumentException">Thrown when S is not an enum type</exception>
     public StateMachine(S startState)
     {
         if (!typeof(S).IsEnum)
@@ -22,6 +35,15 @@ public class StateMachine<S, C> where S : struct, IConvertible
         CurrentState = startState;
     }
 
+    /// <summary>
+    /// Adds a new transition to the state machine.
+    /// </summary>
+    /// <param name="fromState">The state from which the transition starts</param>
+    /// <param name="toState">The state to which the transition leads</param>
+    /// <param name="cause">The cause that triggers the transition</param>
+    /// <param name="precondition">Function that determines if the transition can occur</param>
+    /// <param name="action">Optional action to perform during the transition</param>
+    /// <exception cref="ArgumentException">Thrown when fromState does not exist</exception>
     public void AddTransition(
         S fromState,
         S toState,
@@ -38,6 +60,11 @@ public class StateMachine<S, C> where S : struct, IConvertible
         _states[fromState][cause] = transition;
     }
 
+    /// <summary>
+    /// Triggers a state transition based on the specified cause.
+    /// </summary>
+    /// <param name="cause">The cause that should trigger the transition</param>
+    /// <exception cref="ArgumentException">Thrown when no transition exists for the current state and cause</exception>
     public void TriggerCause(C cause)
     {
         if (!_states[CurrentState].ContainsKey(cause))

@@ -1,3 +1,12 @@
 ﻿namespace StateSwitcher.Runtime;
 
-public enum CellState { Open, Close }
+/// <summary>
+/// Represents the possible states of a Cell.
+/// </summary>
+public enum CellState 
+{ 
+    /// <summary>The cell is open</summary>
+    Open, 
+    /// <summary>The cell is closed</summary>
+    Close 
+}
