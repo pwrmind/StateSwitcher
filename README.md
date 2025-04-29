@@ -49,6 +49,49 @@ cell.SendMessage(CellStateTransitionCause.Fixed);
 await cell.StopAsync();
 ```
 
+## Sequence Diagram
+
+The following diagram illustrates the flow of messages and state transitions in the example above:
+
+```mermaid
+sequenceDiagram
+    participant Program
+    participant Cell
+    participant StateMachine
+    participant TypedActor
+
+    Program->>Cell: new Cell()
+    Note over Cell: Initial state: Open
+    
+    Program->>Cell: SendMessage(Booked)
+    Cell->>TypedActor: Enqueue(Booked)
+    TypedActor->>Cell: HandleMessageAsync(Booked)
+    Cell->>StateMachine: TriggerCause(Booked)
+    Note over StateMachine: State remains Open
+    
+    Program->>Cell: SendMessage(Filled)
+    Cell->>TypedActor: Enqueue(Filled)
+    TypedActor->>Cell: HandleMessageAsync(Filled)
+    Cell->>StateMachine: TriggerCause(Filled)
+    Note over StateMachine: State changes to Close
+    
+    Program->>Cell: SendMessage(Hacked)
+    Cell->>TypedActor: Enqueue(Hacked)
+    TypedActor->>Cell: HandleMessageAsync(Hacked)
+    Cell->>StateMachine: TriggerCause(Hacked)
+    Note over StateMachine: State changes to Open
+    
+    Program->>Cell: SendMessage(Fixed)
+    Cell->>TypedActor: Enqueue(Fixed)
+    TypedActor->>Cell: HandleMessageAsync(Fixed)
+    Cell->>StateMachine: TriggerCause(Fixed)
+    Note over StateMachine: State remains Open
+    
+    Program->>Cell: StopAsync()
+    Cell->>TypedActor: StopAsync()
+    TypedActor-->>Cell: Processing stopped
+```
+
 ## State Transitions
 
 The Cell implementation supports the following state transitions:
